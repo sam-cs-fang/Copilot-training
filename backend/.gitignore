@@ -1,3 +1,6 @@
+# Go specific
+go.sum
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -17,6 +20,6 @@ vendor/
 go.work
 
 # Go build cache
-go.sum
+*.cache/
 
 data/
