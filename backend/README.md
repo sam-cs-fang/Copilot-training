@@ -15,3 +15,10 @@
     * Filter expenses by date range (date range should be within 30 days)
     * login
   * Each user can only see their own expenses
+
+## tech stack
+* Golang
+* Gin
+* Use postgreSQL as database
+* Use JWT for authentication
+* Use docker-compose to run the application

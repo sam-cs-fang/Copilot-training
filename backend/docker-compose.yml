@@ -1,0 +1,17 @@
+# docker-compose up for backend go project
+# start database server (postgres) by image
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: expenseapi
+      POSTGRES_PASSWORD: 67416741
+      POSTGRES_DB: expense
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
