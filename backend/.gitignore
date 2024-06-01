@@ -22,4 +22,4 @@ go.work
 # Go build cache
 *.cache/
 
-data/
+data/*
