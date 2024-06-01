@@ -14,8 +14,8 @@ import (
 type ExpenseRepo interface {
 	GetExpense(userId int, expenseId int) (*model.Expense, error)
 	ListExpenses(userId int) ([]model.Expense, error)
-	CreateExpense(expense *model.Expense) error
-	UpdateExpense(expense *model.Expense) (*model.Expense, error)
+	CreateExpense(expense *model.Expense) (*model.Expense, error)
+	UpdateExpense(expenseId int, userId int, expense *model.Expense) (*model.Expense, error)
 	DeleteExpense(expenseId int) error
 }
 
@@ -52,17 +52,25 @@ func (r *expenseRepo) ListExpenses(userId int) ([]model.Expense, error) {
 }
 
 // CreateExpense 用來新增一筆 Expense
-func (r *expenseRepo) CreateExpense(expense *model.Expense) error {
-	return r.db.Create(expense).Error
+func (r *expenseRepo) CreateExpense(expense *model.Expense) (*model.Expense, error) {
+	if err := r.db.Create(expense).Error; err != nil {
+		return nil, err
+	}
+	return expense, nil
 }
 
 // UpdateExpense 用來更新一筆 Expense
-func (r *expenseRepo) UpdateExpense(expense *model.Expense) (*model.Expense, error) {
-	if err := r.db.Save(expense).Error; err != nil {
+func (r *expenseRepo) UpdateExpense(expenseId int, userId int, expense *model.Expense) (*model.Expense, error) {
+	var existingExpense model.Expense
+	if err := r.db.Where("id = ? AND user_id = ?", expenseId, userId).First(&existingExpense).Error; err != nil {
 		return nil, err
 	}
 
-	return expense, nil
+	if err := r.db.Model(&existingExpense).Updates(expense).Error; err != nil {
+		return nil, err
+	}
+
+	return &existingExpense, nil
 }
 
 // DeleteExpense 用來刪除指定 id 的 Expense

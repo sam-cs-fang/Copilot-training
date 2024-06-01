@@ -18,8 +18,7 @@ func CreateExpenseHandler(c *gin.Context, repo repository.ExpenseRepo) (model.Ex
 		return model.ExpenseDto{}, fmt.Errorf("failed to get expense from context")
 	}
 
-	result := expense.(*model.Expense)
-	err := repo.CreateExpense(result)
+	result, err := repo.CreateExpense(expense.(*model.Expense))
 	if err != nil {
 		return model.ExpenseDto{}, fmt.Errorf("failed to create expense: %v", err)
 	}

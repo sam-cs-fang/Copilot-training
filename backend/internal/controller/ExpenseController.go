@@ -27,6 +27,11 @@ func GetExpense(c *gin.Context, repo repository.ExpenseRepo) {
 				"message": err.Error(),
 			})
 			return
+		case *customError.NotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": err.Error(),
+			})
+			return
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -49,6 +54,11 @@ func ListExpenses(c *gin.Context, repo repository.ExpenseRepo) {
 				"message": err.Error(),
 			})
 			return
+		case *customError.NotFoundError:
+			c.JSON(http.StatusOK, gin.H{
+				"data": []model.Expense{},
+			})
+			return
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -64,7 +74,7 @@ func ListExpenses(c *gin.Context, repo repository.ExpenseRepo) {
 
 func CreateExpense(c *gin.Context, repo repository.ExpenseRepo) {
 
-	var expense model.Expense
+	var expense *model.Expense
 	if err := c.ShouldBindJSON(&expense); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -75,10 +85,23 @@ func CreateExpense(c *gin.Context, repo repository.ExpenseRepo) {
 	c.Set("expense", expense)
 	result, err := handler.CreateExpenseHandler(c, repo)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
+		switch err.(type) {
+		case *customError.ValidationError:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		case *customError.NotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": err.Error(),
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -87,12 +110,34 @@ func CreateExpense(c *gin.Context, repo repository.ExpenseRepo) {
 }
 
 func UpdateExpense(c *gin.Context, repo repository.ExpenseRepo) {
-	result, err := handler.UpdateExpenseHandler(c, repo)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+	var expense *model.Expense
+	if err := c.ShouldBindJSON(&expense); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
 		return
+	}
+
+	c.Set("expense", expense)
+	result, err := handler.UpdateExpenseHandler(c, repo)
+	if err != nil {
+		switch err.(type) {
+		case *customError.ValidationError:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		case *customError.NotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": err.Error(),
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -103,10 +148,23 @@ func UpdateExpense(c *gin.Context, repo repository.ExpenseRepo) {
 func DeleteExpense(c *gin.Context, repo repository.ExpenseRepo) {
 	err := handler.DeleteExpenseHandler(c, repo)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
+		switch err.(type) {
+		case *customError.ValidationError:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": err.Error(),
+			})
+			return
+		case *customError.NotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": err.Error(),
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
 	}
 
 	c.JSON(http.StatusNoContent, gin.H{})
