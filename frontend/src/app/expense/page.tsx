@@ -25,10 +25,10 @@
 // 14. input 欄位右邊有一個日期選擇器，用來篩選支出資料，日期選擇器的上下 padding 為 10px，左右 padding 為 20px
 
 import './style.css';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEventHandler, useEffect, useState } from 'react';
 import { Button, Collapse, Form } from 'react-bootstrap';
-import { Expense } from '../../types/Expense';
-import { getExpenses, listExpenses, createExpense, updateExpense, deleteExpense } from '../../apis/expenseApis';
+import { Expense, CreateExpensePayload, UpdateExpensePayload } from '../../types/Expense';
+import { getExpense, listExpenses, createExpense, updateExpense, deleteExpense } from '../../apis/expenseApis';
 import { formatDateTime } from '../../utils/dateTime';
 
 
@@ -37,39 +37,91 @@ const ExpensePage: React.FC = () => {
     const [name, setName] = useState<string>('');
     const [amount, setAmount] = useState<number>(0);
     const [date, setDate] = useState<string>('');
+    const [category, setCategory] = useState('food');
     const [search, setSearch] = useState<string>('');
     const [filterDate, setFilterDate] = useState<string>('');
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
+    const [minDate, setMinDate] = useState('');
+    const [maxDate, setMaxDate] = useState('');
     
-    const fetchData = async () => {
-        // const data = await getExpenses();
-        // setExpenses(data);
-        return;
+    const fetchExpenses = async () => {
+        const data = await listExpenses(search, filterDate);
+        setExpenses(data ?? []);
     };
     
     useEffect(() => {
-        // fetchData();
+        fetchExpenses();
+    }, []);
+
+    useEffect(() => {
+        const today = new Date();
+        const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+        const formattedMinDate = oneYearAgo.toISOString().split('T')[0];
+        const formattedMaxDate = today.toISOString().split('T')[0];
+        console.log(formattedMinDate, formattedMaxDate);
+        setMinDate(formattedMinDate);
+        setMaxDate(formattedMaxDate);
     }, []);
     
-    const handleCreate = async () => {
-        // await createExpense({ name, amount, date });
-        // fetchData();
-        // setShow(false);
-        return;
+    const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const expenseName = formData.get('expense-name') as string;
+        const amountValue = Number.parseInt(formData.get('expense-amount') as string);
+        const dateValue = formData.get('expense-date') as string;
+        const categoryValue = formData.get('expense-category') as string;
+
+        const payload: CreateExpensePayload = {
+            title: expenseName,
+            amount: amountValue,
+            category: categoryValue,
+            updater: 'aloha',
+            // 時間要轉換為包含時區的 ISO 8601 格式
+            createdAt: new Date(dateValue).toISOString(),
+        };
+        try {
+            const res = await createExpense(payload);
+            setExpenses([...expenses, res]);
+            resetForm();
+        } catch (error) {
+            console.error(error);
+        }
     };
     
-    const handleUpdate = async (id: number) => {
-        // await updateExpense(id, { name, amount, date });
-        // fetchData();
-        // setShow(false);
-        return;
+    const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (editId === null) return;
+
+        const formData = new FormData(e.currentTarget);
+        const expenseName = formData.get('expense-name') as string;
+        const amountValue = Number.parseInt(formData.get('expense-amount') as string);
+        const categoryValue = formData.get('expense-category') as string;
+
+        const payload: UpdateExpensePayload = {
+            title: expenseName,
+            amount: amountValue,
+            category: categoryValue,
+            updater: 'aloha',
+        };
+
+        try {
+            const updatedExpense = await updateExpense(editId, payload);
+            setExpenses(expenses.map(expense => expense.id === editId ? updatedExpense : expense));
+            setEditId(null);
+            setOpen(false);
+        } catch (error) {
+            console.error(error);
+        }
     };
     
     const handleDelete = async (id: number) => {
-        // await deleteExpense(id);
-        // fetchData();
-        return;
+        try {
+            await deleteExpense(id);
+            setExpenses(expenses.filter(expense => expense.id !== id));
+        } catch (error) {
+            console.error(error);
+        }
     };
     
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -77,6 +129,7 @@ const ExpensePage: React.FC = () => {
         const formData = new FormData(e.currentTarget);
         const searchValue = formData.get('search-input-name') as string;
         const dateValue = formData.get('search-input-date') as string;
+        console.log(searchValue, dateValue);
 
         const data = await listExpenses(searchValue, dateValue);
         console.log(data);
@@ -84,24 +137,46 @@ const ExpensePage: React.FC = () => {
     };
     
     const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // setFilterDate(e.target.value);
-        return;
+        const { name, value } = e.target;
+       if (name === 'search-input-name') {
+           setSearch(value);
+       } else if (name === 'search-input-date') {
+           setFilterDate(value);
+       }
     };
     
-    const handleEdit = (id: number) => {
-        // const expense = expenses.find((expense) => expense.id === id);
-        // if (expense) {
-        // setName(expense.name);
-        // setAmount(expense.amount);
-        // setDate(expense.date);
-        // setEditId(id);
-        // setShow(true);
-        // }
-        return;
+    const handleEdit = (expense: Expense) => {
+        setName(expense.title);
+        setAmount(expense.amount);
+        setCategory(expense.category);
+        setEditId(expense.id);
+        setOpen(true);
+    };
+
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedDate = e.target.value;
+        const oneYearAgo = new Date(new Date().setFullYear(new Date().getFullYear() - 1));
+        const selectedDateObj = new Date(selectedDate);
+        if (selectedDateObj < oneYearAgo || selectedDateObj > new Date()) {
+            setDate(''); // 如果日期不在范围内，重置日期
+        } else {
+            setDate(selectedDate);
+        }
     };
     
     const handleToggle = () => {
         setOpen(!open);
+        if (!open) {
+            resetForm();
+        }
+    };
+
+    const resetForm = () => {
+        setName('');
+        setAmount(0);
+        setDate('');
+        setCategory('food');
+        setEditId(null);
     };
     
     return (
@@ -119,24 +194,66 @@ const ExpensePage: React.FC = () => {
                     className='button'
                     variant="primary"
                     onClick={handleToggle}
-                >新增支出</Button>
+                >{open ? (editId === null ? '取消新增' : '取消編輯') : '新增支出'}</Button>
                 {open && (
                     <div id="example-collapse-text">
-                        <form>
-                            <div className="form-group">
-                                <label htmlFor="name">名稱</label>
-                                <input type="text" className="form-control" id="name" value="" onChange={(e) => setName(e.target.value)} />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="amount">金額</label>
-                                <input type="number" className="form-control" id="amount" value="" onChange={(e) => setAmount(Number.parseInt(e.target.value))} />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="date">日期</label>
-                                <input type="date" className="form-control" id="date" value="" onChange={(e) => setDate(e.target.value)} />
-                            </div>
-                            <button type="submit" className="btn btn-primary" onClick={handleCreate}>確認</button>
-                        </form>
+                        <Form onSubmit={editId === null ? handleCreate : handleUpdate}>
+                            <Form.Group className="form-group">
+                                <Form.Label htmlFor="name">名稱</Form.Label>
+                                <Form.Control
+                                    name="expense-name"
+                                    type="text"
+                                    className="form-control"
+                                    id="expense-name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                            </Form.Group>
+                            <Form.Group className="form-group">
+                                <Form.Label htmlFor="amount">金額</Form.Label>
+                                <Form.Control
+                                    name="expense-amount"
+                                    type="number"
+                                    className="form-control"
+                                    id="expense-amount"
+                                    min={0}
+                                    value={amount}
+                                    onChange={(e) => setAmount(Number.parseInt(e.target.value))}
+                                />
+                            </Form.Group>
+                            <Form.Group className="form-group">
+                                <Form.Label htmlFor="date">日期</Form.Label>
+                                <Form.Control
+                                    name="expense-date"
+                                    type="date"
+                                    className="form-control"
+                                    id="expense-date"
+                                    max={maxDate}
+                                    min={minDate}
+                                    value={date}
+                                    onChange={handleDateChange}
+                                />
+                            </Form.Group>
+                            <Form.Group className="form-group">
+                                <Form.Label htmlFor="category">類別</Form.Label>
+                                <Form.Control
+                                    name="expense-category"
+                                    as="select"
+                                    className="form-control"
+                                    id="category"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                >
+                                    <option value="food">食物</option>
+                                    <option value="clothing">衣物</option>
+                                    <option value="housing">住房</option>
+                                    <option value="transportation">交通</option>
+                                </Form.Control>
+                            </Form.Group>
+                            <Button type="submit" className="btn btn-primary">
+                                {editId === null ? '確認' : '更新'}
+                            </Button>
+                        </Form>
                     </div>
                 )}
                 <table className='table'>
@@ -144,19 +261,21 @@ const ExpensePage: React.FC = () => {
                         <tr>
                             <th>名稱</th>
                             <th>金額</th>
+                            <th>類別</th>
                             <th>日期</th>
                             <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         {expenses.map((expense) => (
-                            <tr key={expense.expenseId}>
+                            <tr key={expense.id}>
                                 <td>{expense.title}</td>
                                 <td>{expense.amount}</td>
+                                <td>{expense.category}</td>
                                 <td>{formatDateTime(expense.date)}</td>
                                 <td>
-                                    <Button className='button td-btn' variant="primary" onClick={() => handleEdit(expense.expenseId)}>編輯</Button>
-                                    <Button className='button td-btn' variant="danger" onClick={() => handleDelete(expense.expenseId)}>刪除</Button>
+                                    <Button className='button td-btn' variant="primary" onClick={() => handleEdit(expense)}>編輯</Button>
+                                    <Button className='button td-btn' variant="danger" onClick={() => handleDelete(expense.id)}>刪除</Button>
                                 </td>
                             </tr>
                         ))}
