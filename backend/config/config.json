@@ -1,0 +1,15 @@
+{
+    "server": {
+        "port": 6741
+    },
+    "postgres": {
+        "host": "localhost",
+        "port": 5432,
+        "username": "expenseapi",
+        "password": "67416741",
+        "database": "expense"
+    },
+    "jwt": {
+        "secret": "mhdada"
+    }
+}
