@@ -11,5 +11,9 @@ func HandleGormError(err error) error {
 		return &NotFoundError{Message: err.Error()}
 	}
 
+	if errors.Is(err, gorm.ErrDuplicatedKey) {
+		return &DuplicateKeyError{Message: err.Error()}
+	}
+
 	return err
 }

@@ -2,7 +2,7 @@ package controller
 
 import (
 	customError "backend/internal/error"
-	"backend/internal/handler"
+	handler "backend/internal/handler/expense"
 	"backend/internal/model"
 	"backend/internal/repository"
 	"net/http"

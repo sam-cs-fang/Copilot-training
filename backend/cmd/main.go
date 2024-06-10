@@ -28,9 +28,11 @@ func main() {
 
 	postgresDb := model.CreateDatabase()
 	expenseRepo := repository.CreateExpenseRepo(postgresDb)
+	userRepo := repository.CreateUserRepo(postgresDb)
 
 	// 註冊路由
 	controller.RegisterExpenseRoutes(r, expenseRepo)
+	controller.RegisterUserRoutes(r, userRepo)
 
 	// 啟動服務
 	port := viper.GetString("server.port")

@@ -6,12 +6,10 @@ import (
 
 type User struct {
 	gorm.Model
-	username string
-	password float64
+	Username string `gorm:"column:username"`
+	Password string `gorm:"column:password"`
 }
 
 type UserDto struct {
-	ID       int     `json:"id"`
-	Username string  `json:"username"`
-	Password float64 `json:"password"`
+	ID uint `json:"id"`
 }

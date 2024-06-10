@@ -10,6 +10,6 @@
         "database": "expense"
     },
     "jwt": {
-        "secret": "iamsecret"
+        "secret": "mhdada"
     }
 }
