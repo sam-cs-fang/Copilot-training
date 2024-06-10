@@ -17,15 +17,15 @@ import (
 func ListExpenseHandler(c *gin.Context, repo repository.ExpenseRepo) ([]model.ExpenseDto, error) {
 	userId, exist := c.Get("userId")
 	if !exist {
-		return nil, &customError.ValidationError{Message: "userId not found in context"}
+		return []model.ExpenseDto{}, &customError.ValidationError{Message: "userId not found in context"}
 	}
 
-	expenses, err := repo.ListExpenses(userId.(int))
+	expenses, err := repo.ListExpenses(int(userId.(float64)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to list expenses: %v", err)
+		return []model.ExpenseDto{}, fmt.Errorf("failed to list expenses: %v", err)
 	}
 
-	var expenseDtos []model.ExpenseDto
+	expenseDtos := make([]model.ExpenseDto, 0)
 	for _, expense := range expenses {
 		expenseDtos = append(expenseDtos, model.ExpenseDto{
 			ID:       int(expense.ID),

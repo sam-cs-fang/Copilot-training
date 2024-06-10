@@ -2,7 +2,7 @@ package controller
 
 import (
 	customError "backend/internal/error"
-	handler "backend/internal/handler/expense"
+	"backend/internal/handler"
 	"backend/internal/model"
 	"backend/internal/repository"
 	"net/http"
@@ -10,12 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterExpenseRoutes(router *gin.Engine, repo repository.ExpenseRepo) {
-	router.GET("api/v1/expenses/:id", func(ctx *gin.Context) { GetExpense(ctx, repo) })
-	router.GET("api/v1/expenses", func(ctx *gin.Context) { ListExpenses(ctx, repo) })
-	router.POST("api/v1/expenses", func(ctx *gin.Context) { CreateExpense(ctx, repo) })
-	router.PUT("api/v1/expenses/:id", func(ctx *gin.Context) { UpdateExpense(ctx, repo) })
-	router.DELETE("api/v1/expenses/:id", func(ctx *gin.Context) { DeleteExpense(ctx, repo) })
+func RegisterExpenseRoutes(router *gin.RouterGroup, repo repository.ExpenseRepo) {
+	router.GET("/expenses/:id", func(ctx *gin.Context) { GetExpense(ctx, repo) })
+	router.GET("/expenses", func(ctx *gin.Context) { ListExpenses(ctx, repo) })
+	router.POST("/expenses", func(ctx *gin.Context) { CreateExpense(ctx, repo) })
+	router.PUT("/expenses/:id", func(ctx *gin.Context) { UpdateExpense(ctx, repo) })
+	router.DELETE("/expenses/:id", func(ctx *gin.Context) { DeleteExpense(ctx, repo) })
 }
 
 func GetExpense(c *gin.Context, repo repository.ExpenseRepo) {
@@ -81,6 +81,15 @@ func CreateExpense(c *gin.Context, repo repository.ExpenseRepo) {
 		})
 		return
 	}
+
+	userId, exist := c.Get("userId")
+	if !exist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "userId not found in context",
+		})
+		return
+	}
+	expense.UserID = int(userId.(float64))
 
 	c.Set("expense", expense)
 	result, err := handler.CreateExpenseHandler(c, repo)

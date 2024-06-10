@@ -29,7 +29,7 @@ func UpdateExpenseHandler(c *gin.Context, repo repository.ExpenseRepo) (model.Ex
 		return model.ExpenseDto{}, &customError.ValidationError{Message: "Invalid expense id"}
 	}
 
-	result, err := repo.UpdateExpense(expenseId, userId.(int), expense.(*model.Expense))
+	result, err := repo.UpdateExpense(expenseId, int(userId.(float64)), expense.(*model.Expense))
 	if err != nil {
 		return model.ExpenseDto{}, customError.HandleGormError(err)
 	}

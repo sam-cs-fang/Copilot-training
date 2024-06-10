@@ -11,7 +11,7 @@ import (
 // 定義一個 UserRepo 的 interface
 type UserRepo interface {
 	CreateUser(user *model.User) (*model.User, error)
-	GetUserByUsernameAndPassword(username string, password string) (*model.User, error)
+	GetUserByUsername(username string) (*model.User, error)
 }
 
 type userRepo struct {
@@ -40,9 +40,9 @@ func (r *userRepo) CreateUser(user *model.User) (*model.User, error) {
 }
 
 // GetUserByUsernameAndPassword 用來取得指定 Username & Password 的 User
-func (r *userRepo) GetUserByUsernameAndPassword(username string, password string) (*model.User, error) {
+func (r *userRepo) GetUserByUsername(username string) (*model.User, error) {
 	user := model.User{}
-	err := r.db.Where("username = ? AND password = ?", username, password).First(&user).Error
+	err := r.db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return nil, err
 	}

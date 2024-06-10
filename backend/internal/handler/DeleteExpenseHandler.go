@@ -20,7 +20,12 @@ func DeleteExpenseHandler(c *gin.Context, repo repository.ExpenseRepo) error {
 		return &customError.ValidationError{Message: fmt.Sprintf("invalid expense id: %v", err)}
 	}
 
-	err = repo.DeleteExpense(expenseIdInt)
+	userId, exists := c.Get("userId")
+	if !exists {
+		return &customError.ValidationError{Message: "UserId not found in context"}
+	}
+
+	err = repo.DeleteExpense(expenseIdInt, int(userId.(float64)))
 	if err != nil {
 		return fmt.Errorf("failed to delete expense: %v", err)
 	}

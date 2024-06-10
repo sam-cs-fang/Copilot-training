@@ -16,7 +16,7 @@ type ExpenseRepo interface {
 	ListExpenses(userId int) ([]model.Expense, error)
 	CreateExpense(expense *model.Expense) (*model.Expense, error)
 	UpdateExpense(expenseId int, userId int, expense *model.Expense) (*model.Expense, error)
-	DeleteExpense(expenseId int) error
+	DeleteExpense(expenseId int, userId int) error
 }
 
 // 定義一個 ExpenseRepo 的 struct
@@ -74,8 +74,12 @@ func (r *expenseRepo) UpdateExpense(expenseId int, userId int, expense *model.Ex
 }
 
 // DeleteExpense 用來刪除指定 id 的 Expense
-func (r *expenseRepo) DeleteExpense(id int) error {
-	return r.db.Delete(&model.Expense{}, id).Error
+func (r *expenseRepo) DeleteExpense(id int, userId int) error {
+	if err := r.db.Where("id = ? AND user_id = ?", id, userId).Delete(&model.Expense{}).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateExpenseRepo 用來建立一個 ExpenseRepo 的實例

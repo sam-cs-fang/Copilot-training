@@ -24,15 +24,23 @@ func main() {
 	r.Use(cors.New(corsConfig))
 
 	r.Use(middleware.Logger())
-	r.Use(middleware.Auth())
 
 	postgresDb := model.CreateDatabase()
 	expenseRepo := repository.CreateExpenseRepo(postgresDb)
 	userRepo := repository.CreateUserRepo(postgresDb)
 
-	// 註冊路由
-	controller.RegisterExpenseRoutes(r, expenseRepo)
-	controller.RegisterUserRoutes(r, userRepo)
+	// 要驗證 token 的 routes
+	private := r.Group("/api/v1")
+	private.Use(middleware.Auth())
+	{
+		controller.RegisterExpenseRoutes(private, expenseRepo)
+	}
+
+	// 不用驗證 token 的 routes
+	public := r.Group("/api/v1")
+	{
+		controller.RegisterUserRoutes(public, userRepo)
+	}
 
 	// 啟動服務
 	port := viper.GetString("server.port")

@@ -3,7 +3,7 @@ package controller
 import (
 	"backend/internal/controller/requests"
 	customError "backend/internal/error"
-	handler "backend/internal/handler/user"
+	"backend/internal/handler"
 	"backend/internal/repository"
 	"backend/internal/utils"
 	"net/http"
@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterUserRoutes(router *gin.Engine, repo repository.UserRepo) {
-	router.POST("api/v1/users/signin", func(ctx *gin.Context) { UserSignIn(ctx, repo) })
-	router.POST("api/v1/users/signup", func(ctx *gin.Context) { UserSignUp(ctx, repo) })
+func RegisterUserRoutes(router *gin.RouterGroup, repo repository.UserRepo) {
+	router.POST("/users/signin", func(ctx *gin.Context) { UserSignIn(ctx, repo) })
+	router.POST("/users/signup", func(ctx *gin.Context) { UserSignUp(ctx, repo) })
 }
 
 // 使用者登入，登入成功後會將 userId 包裹在 JWT 中回傳

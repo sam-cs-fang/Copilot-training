@@ -20,7 +20,7 @@ func GetExpenseHandler(c *gin.Context, repo repository.ExpenseRepo) (model.Expen
 		return model.ExpenseDto{}, &customError.ValidationError{Message: "Invalid expense id"}
 	}
 
-	expense, err := repo.GetExpense(userId.(int), expenseId)
+	expense, err := repo.GetExpense(int(userId.(float64)), expenseId)
 	if err != nil {
 		return model.ExpenseDto{}, customError.HandleGormError(err)
 	}
