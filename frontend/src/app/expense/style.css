@@ -74,8 +74,8 @@ body {
     width: 70%;
 }
 
-.form-control-date {
-    width: 30%;
+.form-control-btn {
+    margin-left: 15px;
 }
 
 .button {

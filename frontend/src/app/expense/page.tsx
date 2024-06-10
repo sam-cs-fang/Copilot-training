@@ -33,7 +33,7 @@ import { formatDateTime } from '../../utils/dateTime';
 
 
 const ExpensePage: React.FC = () => {
-    const [expenses, setExpenses] = useState<Expense[]>([{ expenseId: 1, title: 'test', amount: 100, date: '2021-10-01', updater: 'test' }, { expenseId: 2, title: 'test2', amount: 200, date: '2021-10-02', updater: 'test2' }]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
     const [name, setName] = useState<string>('');
     const [amount, setAmount] = useState<number>(0);
     const [date, setDate] = useState<string>('');
@@ -72,9 +72,15 @@ const ExpensePage: React.FC = () => {
         return;
     };
     
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // setSearch(e.target.value);
-        return;
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const searchValue = formData.get('search-input-name') as string;
+        const dateValue = formData.get('search-input-date') as string;
+
+        const data = await listExpenses(searchValue, dateValue);
+        console.log(data);
+        setExpenses(data ?? []);
     };
     
     const handleFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,10 +108,11 @@ const ExpensePage: React.FC = () => {
         <div className="container">
             <div className="content">
                 <h1 className='title'>支出管理</h1>
-                <Form className='form'>
+                <Form className='form' onSubmit={handleSearch}>
                     <Form.Group className='form-group'>
-                        <Form.Control className='form-control-input' type="text" placeholder="搜尋支出" value={search} onChange={handleSearch} />
-                        <Form.Control className='form-control-date' type="date" value={filterDate} onChange={handleFilter} />
+                        <Form.Control name='search-input-name' className='form-control-input' type="text" placeholder="搜尋支出" value={search} onChange={handleFilter} />
+                        <Form.Control name='search-input-date' className='form-control-date' type="date" value={filterDate} onChange={handleFilter} />
+                        <Form.Control className='button form-control-btn' type="submit" value="搜尋" />
                     </Form.Group>
                 </Form>
                 <Button
