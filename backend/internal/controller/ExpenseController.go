@@ -11,11 +11,11 @@ import (
 )
 
 func RegisterExpenseRoutes(router *gin.Engine, repo repository.ExpenseRepo) {
-	router.GET("api/v1/expense/:id", func(ctx *gin.Context) { GetExpense(ctx, repo) })
-	router.GET("api/v1/expense", func(ctx *gin.Context) { ListExpenses(ctx, repo) })
-	router.POST("api/v1/expense", func(ctx *gin.Context) { CreateExpense(ctx, repo) })
-	router.PUT("api/v1/expense/:id", func(ctx *gin.Context) { UpdateExpense(ctx, repo) })
-	router.DELETE("api/v1/expense/:id", func(ctx *gin.Context) { DeleteExpense(ctx, repo) })
+	router.GET("api/v1/expenses/:id", func(ctx *gin.Context) { GetExpense(ctx, repo) })
+	router.GET("api/v1/expenses", func(ctx *gin.Context) { ListExpenses(ctx, repo) })
+	router.POST("api/v1/expenses", func(ctx *gin.Context) { CreateExpense(ctx, repo) })
+	router.PUT("api/v1/expenses/:id", func(ctx *gin.Context) { UpdateExpense(ctx, repo) })
+	router.DELETE("api/v1/expenses/:id", func(ctx *gin.Context) { DeleteExpense(ctx, repo) })
 }
 
 func GetExpense(c *gin.Context, repo repository.ExpenseRepo) {
