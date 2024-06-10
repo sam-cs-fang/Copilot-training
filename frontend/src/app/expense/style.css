@@ -1,0 +1,194 @@
+
+/* 以下是我想要的 style，請幫我完成 style.css 的內容
+1. 背景是一個純白背景
+2. 頁面中間有一個區域是主要內容，最大寬度為視窗的 80%，置中
+3. 主要內容區域包含一個標題，標題的上下 padding 為 20px，左右 padding 為 0，文字置中，內容是「支出管理」
+4. 主要內容區域包含一個按鈕，按鈕的上下 padding 為 20px，左右 padding 為 0，文字置中，內容是「新增支出」
+5. 主要內容區域包含一個表格，表格的上下 padding 為 20px，左右 padding 為 0，文字置中，會根據支出資料的數量動態增加列數
+6. 表格的標題列背景色是 #f0f0f0，文字顏色是黑色，字體大小是 16px，字體粗細是 bold
+7. 表格的內容列背景色是白色，文字顏色是黑色，字體大小是 14px，字體粗細是 normal
+8. 表格的內容列中，最後一個欄位是操作欄，會包含三個按鈕，分別是「編輯」、「刪除」
+9. 按鈕的背景色是 #007bff，文字顏色是白色，字體大小是 14px，字體粗細是 normal
+10. 表格的內容列中，日期格式為 yyyy-mm-dd
+11. 表格的內容列中，金額格式為 $1,000.00
+12. 表格與標題之間有一個 input 欄位，用來搜尋支出資料，input 欄位的上下 padding 為 10px，左右 padding 為 20px
+13. input 欄位的 placeholder 是「搜尋支出」
+14. input 欄位右邊有一個日期選擇器，用來篩選支出資料，日期選擇器的上下 padding 為 10px，左右 padding 為 20px */
+
+body {
+  background-color: #ffffff;
+}
+
+.container {
+  max-width: 80%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100vh;
+}
+
+.content {
+  padding: 20px 0;
+  text-align: center;
+  width: 60%;
+}
+
+.title {
+  padding: 20px 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.form {
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.form-group input {
+    display: block;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.form-control-input {
+    margin-right: 20px;
+    width: 70%;
+}
+
+.form-control-date {
+    width: 30%;
+}
+
+.button {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+.button:hover {
+    color: #fff;
+    background-color: #0069d9;
+    border-color: #0062cc;
+    cursor: pointer;
+}
+.button:focus, .button.focus {
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.5);
+}
+.button:disabled, .button.disabled {
+    opacity: .65;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.table th {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    background-color: #f0f0f0;
+    color: #000000;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.table td {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.table td:last-child {
+    display: flex;
+    justify-content: center;
+}
+
+.td-btn {
+    margin: 0 5px;
+}
+
+#example-collapse-text {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+#example-collapse-text form {
+    max-width: 500px;
+    margin: auto;
+}
+
+#example-collapse-text .form-group {
+    margin-bottom: 15px;
+}
+
+#example-collapse-text .form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#example-collapse-text .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#example-collapse-text .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    background-color: #007bff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#example-collapse-text .btn:hover {
+    background-color: #0056b3;
+}
